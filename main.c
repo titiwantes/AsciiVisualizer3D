@@ -26,7 +26,7 @@ typedef struct
     float distanceFromCam;
 } Shape;
 
-typedef struct
+typedef struct Screen
 {
     int width;
     int height;
@@ -78,68 +78,59 @@ void freeShape(Shape *shape)
     }
 }
 
-Point3D Rotate(const Shape *restrict s, int index)
+Point3D Rotate(Shape s, int index)
 {
-    Point3D p = s->points[index];
+    Point3D p = s.points[index];
+    float x = p.y * sin(s.A) * sin(s.B) * cos(s.C) - p.z * cos(s.A) * sin(s.B) * cos(s.C) +
+              p.y * cos(s.A) * sin(s.C) + p.z * sin(s.A) * sin(s.C) + p.x * cos(s.B) * cos(s.C);
 
-    float sinA = sin(s->A), cosA = cos(s->A);
-    float sinB = sin(s->B), cosB = cos(s->B);
-    float sinC = sin(s->C), cosC = cos(s->C);
+    float y = p.y * cos(s.A) * cos(s.C) + p.z * sin(s.A) * cos(s.C) -
+              p.y * sin(s.A) * sin(s.B) * sin(s.C) + p.z * cos(s.A) * sin(s.B) * sin(s.C) -
+              p.x * cos(s.B) * sin(s.C);
 
-    float x = p.y * sinA * sinB * cosC - p.z * cosA * sinB * cosC +
-              p.y * cosA * sinC + p.z * sinA * sinC + p.x * cosB * cosC;
+    float z = p.z * cos(s.A) * cos(s.B) - p.y * sin(s.A) * cos(s.B) + p.x * sin(s.B);
 
-    float y = p.y * cosA * cosC + p.z * sinA * cosC -
-              p.y * sinA * sinB * sinC + p.z * cosA * sinB * sinC -
-              p.x * cosB * sinC;
-
-    float z = p.z * cosA * cosB - p.y * sinA * cosB + p.x * sinB;
-
-    return (Point3D){x, y, z};
-}
-
-Point3D applyPerspective(Point3D p, float distanceFromCam)
-{
-    float factor = PERSPECTIVE_FACTOR / (p.z + distanceFromCam + 5);
-    return (Point3D){p.x * factor, p.y * factor, p.z};
+    Point3D point = {x, y, z};
+    return point;
 }
 
 void renderScreen(Screen *screen)
 {
-    printf("\x1b[?25l"); // Cacher le curseur
-    printf("\x1b[H");    // Positionner le curseur au coin supérieur gauche
+    printf("\x1b[?25l");
+    printf("\x1b[H");
 
     for (int i = 0; i < screen->height; i++)
     {
         printf("%.*s\x1b[0m\n", screen->width, screen->buffer + i * screen->width);
     }
 
-    printf("\x1b[?25h"); // Montrer le curseur
+    printf("\x1b[?25h");
 }
 
 void renderShape(Screen *screen, Shape *shape)
 {
+    float shapeSizeFactor;
     int x, y, index;
 
     for (int i = 0; i < shape->size; i++)
     {
-        Point3D p = Rotate(shape, i);
-        Point3D perspectivePoint = applyPerspective(p, shape->distanceFromCam);
+        Point3D p = Rotate(*shape, i);
+        shapeSizeFactor = PERSPECTIVE_FACTOR / (p.z + shape->distanceFromCam + 5);
 
-        x = (int)(screen->width / 2 + PERSPECTIVE_DISTORTION * perspectivePoint.x);
-        y = (int)(screen->height / 2 + PERSPECTIVE_DISTORTION * perspectivePoint.y);
+        x = (int)(screen->width / 2 + PERSPECTIVE_DISTORTION * shapeSizeFactor * p.x);
+        y = (int)(screen->height / 2 + PERSPECTIVE_DISTORTION * shapeSizeFactor * p.y);
+
         index = x + y * screen->width;
 
         if (x >= 0 && x < screen->width && y >= 0 && y < screen->height)
         {
-            if (perspectivePoint.z > screen->depthBuffer[index])
+            if (shapeSizeFactor > screen->depthBuffer[index])
             {
-                screen->depthBuffer[index] = perspectivePoint.z;
+                screen->depthBuffer[index] = shapeSizeFactor;
                 screen->buffer[index] = '#';
             }
         }
     }
-
     shape->A += 0.05;
     shape->B += 0.03;
     shape->C += 0.02;
