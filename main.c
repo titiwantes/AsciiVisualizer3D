@@ -78,20 +78,19 @@ void freeShape(Shape *shape)
     }
 }
 
-Point3D Rotate(Shape s, int index)
+Point3D rotate(const Shape *restrict s, int index)
 {
-    Point3D p = s.points[index];
-    float x = p.y * sin(s.A) * sin(s.B) * cos(s.C) - p.z * cos(s.A) * sin(s.B) * cos(s.C) +
-              p.y * cos(s.A) * sin(s.C) + p.z * sin(s.A) * sin(s.C) + p.x * cos(s.B) * cos(s.C);
-
-    float y = p.y * cos(s.A) * cos(s.C) + p.z * sin(s.A) * cos(s.C) -
-              p.y * sin(s.A) * sin(s.B) * sin(s.C) + p.z * cos(s.A) * sin(s.B) * sin(s.C) -
-              p.x * cos(s.B) * sin(s.C);
-
-    float z = p.z * cos(s.A) * cos(s.B) - p.y * sin(s.A) * cos(s.B) + p.x * sin(s.B);
-
-    Point3D point = {x, y, z};
-    return point;
+    Point3D p = s->points[index];
+    float sinA = sin(s->A), cosA = cos(s->A);
+    float sinB = sin(s->B), cosB = cos(s->B);
+    float sinC = sin(s->C), cosC = cos(s->C);
+    float x = p.y * sinA * sinB * cosC - p.z * cosA * sinB * cosC +
+              p.y * cosA * sinC + p.z * sinA * sinC + p.x * cosB * cosC;
+    float y = p.y * cosA * cosC + p.z * sinA * cosC -
+              p.y * sinA * sinB * sinC + p.z * cosA * sinB * sinC -
+              p.x * cosB * sinC;
+    float z = p.z * cosA * cosB - p.y * sinA * cosB + p.x * sinB;
+    return (Point3D){x, y, z};
 }
 
 void renderScreen(Screen *screen)
@@ -114,7 +113,7 @@ void renderShape(Screen *screen, Shape *shape)
 
     for (int i = 0; i < shape->size; i++)
     {
-        Point3D p = Rotate(*shape, i);
+        Point3D p = rotate(shape, i);
         shapeSizeFactor = PERSPECTIVE_FACTOR / (p.z + shape->distanceFromCam + 5);
 
         x = (int)(screen->width / 2 + PERSPECTIVE_DISTORTION * shapeSizeFactor * p.x);
