@@ -10,6 +10,7 @@ SRC_FILES = $(SRC_DIR)/main.c\
 			$(SRC_DIR)/shapes/shape.c\
 			$(SRC_DIR)/shapes/cube.c\
 			$(SRC_DIR)/shapes/torus.c\
+			$(SRC_DIR)/screen/light.c\
 
 OBJ_FILES = $(SRC_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 
