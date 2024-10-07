@@ -5,11 +5,8 @@
 
 typedef struct
 {
+    // plus de précision pour les calculs
     double x, y, z;
     double dir_x, dir_y, dir_z;
     double intensity;
 } Light;
-
-Point3D normalize(Point3D v);
-float dotProduct(Point3D a, Point3D b);
-char calculateLighting(Point3D normal, Point3D lightDir, float intensity);

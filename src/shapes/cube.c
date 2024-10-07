@@ -5,7 +5,7 @@
 #include "cube.h"
 #include "../screen/screen.h"
 
-Shape createCube(int length)
+Shape createCube(int length, float offset)
 {
     Shape cube;
     int facePoints = 6 * length * length - 12 * length + 8;
@@ -36,5 +36,6 @@ Shape createCube(int length)
     cube.B = 0;
     cube.C = 0;
     cube.distanceFromCam = 500;
+    cube.offset = offset;
     return cube;
 }

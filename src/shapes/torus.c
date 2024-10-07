@@ -32,5 +32,6 @@ Shape createTorus(float R, float r, int numSides, int numRings)
     torus.B = 0;
     torus.C = 0;
     torus.distanceFromCam = 10;
+    torus.offset = 0;
     return torus;
 }

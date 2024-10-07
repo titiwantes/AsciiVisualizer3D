@@ -23,11 +23,8 @@ void renderScreen(Screen *screen)
     printf("%s", output);
 }
 
-void renderShape(Screen *screen, Shape *shape, Light *light)
+Point3D centerShape(Shape *shape)
 {
-    float shapeSizeFactor;
-    int x, y, index;
-
     float minX = shape->points[0].x, maxX = shape->points[0].x;
     float minY = shape->points[0].y, maxY = shape->points[0].y;
     float minZ = shape->points[0].z, maxZ = shape->points[0].z;
@@ -48,9 +45,15 @@ void renderShape(Screen *screen, Shape *shape, Light *light)
             maxZ = shape->points[i].z;
     }
 
-    float centerX = (maxX + minX) / 2.0f;
-    float centerY = (maxY + minY) / 2.0f;
-    float centerZ = (maxZ + minZ) / 2.0f;
+    return (Point3D){(maxX + minX) / 2.0f, (maxY + minY) / 2.0f, (maxZ + minZ) / 2.0f};
+}
+
+void renderShape(Screen *screen, Shape *shape, Light *light)
+{
+    float shapeSizeFactor;
+    int x, y, index;
+
+    Point3D center = centerShape(shape);
 
     double light_length = sqrt(light->dir_x * light->dir_x + light->dir_y * light->dir_y + light->dir_z * light->dir_z);
     if (light_length != 0)
@@ -63,11 +66,11 @@ void renderShape(Screen *screen, Shape *shape, Light *light)
     for (int i = 0; i < shape->size; i++)
     {
         Point3D a = shape->points[i];
-        Point3D p = rotate(shape, (Point3D){a.x - centerX, a.y - centerY, a.z - centerZ});
-        shapeSizeFactor = PERSPECTIVE_FACTOR / ((p.z + centerZ) + shape->distanceFromCam + 5);
+        Point3D p = rotate(shape, (Point3D){a.x - center.x, a.y - center.y, a.z - center.z});
+        shapeSizeFactor = PERSPECTIVE_FACTOR / ((p.z + center.z) + shape->distanceFromCam + 5);
 
-        x = (int)(screen->width / 2 + PERSPECTIVE_DISTORTION * shapeSizeFactor * (p.x + centerX));
-        y = (int)(screen->height / 2 + PERSPECTIVE_DISTORTION * shapeSizeFactor * (p.y + centerY));
+        x = (int)(screen->width / 2 + PERSPECTIVE_DISTORTION * shapeSizeFactor * (p.x + center.x) + shape->offset);
+        y = (int)(screen->height / 2 + PERSPECTIVE_DISTORTION * shapeSizeFactor * (p.y + center.y));
 
         index = x + y * screen->width;
 
@@ -90,7 +93,8 @@ void renderShape(Screen *screen, Shape *shape, Light *light)
                 }
 
                 double light_intensity = normal_x * light->dir_x + normal_y * light->dir_y + normal_z * light->dir_z;
-                light_intensity = fmax(light_intensity * light->intensity, AMBIENT_LIGHT); // Assurer au moins la lumière ambiante
+
+                light_intensity = fmax(light_intensity * light->intensity, AMBIENT_LIGHT);
 
                 double view_x = -p.x;
                 double view_y = -p.y;
