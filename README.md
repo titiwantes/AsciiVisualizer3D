@@ -2,8 +2,7 @@
 
 AsciiVisualizer3D est un projet en C qui affiche des formes 3D (cube, tore) en utilisant des caractères ASCII dans la console. Les objets tournent en temps réel avec une simulation de perspective simple.
 
-![Démo](assets/demo.gif)
-
+![Démo](assets/gif.gif)
 
 ## Fonctionnalités
 
