@@ -23,10 +23,11 @@ void renderScreen(Screen *screen)
     printf("%s", output);
 }
 
-void renderShape(Screen *screen, Shape *shape)
+void renderShape(Screen *screen, Shape *shape, Light *light)
 {
     float shapeSizeFactor;
     int x, y, index;
+    Point3D lightPos = light->position;
 
     for (int i = 0; i < shape->size; i++)
     {
@@ -43,7 +44,16 @@ void renderShape(Screen *screen, Shape *shape)
             if (shapeSizeFactor > screen->depthBuffer[index])
             {
                 screen->depthBuffer[index] = shapeSizeFactor;
-                screen->buffer[index] = '#';
+                Point3D lightDir = {
+                    lightPos.x - p.x,
+                    lightPos.y - p.y,
+                    lightPos.z - p.z};
+                lightDir = normalize(lightDir);
+
+                Point3D normal = normalize(p);
+
+                char charToDraw = calculateLighting(normal, lightDir, light->intensity);
+                screen->buffer[index] = charToDraw;
             }
         }
     }

@@ -1,6 +1,7 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 #include "../shapes/shape.h"
+#include "light.h"
 
 #define FRAME_DELAY 15000
 #define PERSPECTIVE_DISTORTION 60
@@ -17,7 +18,7 @@ typedef struct
 } Screen;
 
 void renderScreen(Screen *screen);
-void renderShape(Screen *screen, Shape *shape);
+void renderShape(Screen *screen, Shape *shape, Light *light);
 void clearBuffer(Screen *screen);
 void cleanup(Screen *screen, Shape *shape);
 
