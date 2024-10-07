@@ -12,7 +12,7 @@ int main()
 {
     Screen screen = {150, 80, 0, ' ', NULL, NULL};
     Shape cube = createCube(50);
-    // Shape torus = createTorus(1.2f, 0.5f, 30, 60);
+    Shape torus = createTorus(1.2f, 0.5f, 100, 100);
     int screenSize = screen.width * screen.height;
 
     screen.buffer = (char *)malloc(screenSize * sizeof(char));
@@ -21,7 +21,7 @@ int main()
     if (!screen.buffer || !screen.depthBuffer)
     {
         perror("Failed to allocate memory for screen buffers");
-        // cleanup(&screen, &torus);
+        cleanup(&screen, &torus);
         cleanup(&screen, &cube);
         exit(EXIT_FAILURE);
     }
@@ -31,13 +31,13 @@ int main()
     while (is_rendering)
     {
         clearBuffer(&screen);
-        // renderShape(&screen, &cube);
+        renderShape(&screen, &torus);
         renderCube(&screen, &cube);
         renderScreen(&screen);
         usleep(FRAME_DELAY);
     }
 
+    cleanup(&screen, &torus);
     cleanup(&screen, &cube);
-
     return 0;
 }

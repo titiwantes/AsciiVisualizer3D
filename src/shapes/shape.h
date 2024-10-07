@@ -18,7 +18,7 @@ typedef struct
     float distanceFromCam;
 } Shape;
 
-Point3D rotate(const Shape *s, int index);
+Point3D rotate(const Shape *s, Point3D p);
 void freeShape(Shape *shape);
 
 #endif
