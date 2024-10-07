@@ -16,6 +16,7 @@ typedef struct
     float B;
     float C;
     float distanceFromCam;
+    float offset;
 } Shape;
 
 Point3D rotate(const Shape *s, Point3D p);

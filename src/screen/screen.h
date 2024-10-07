@@ -3,7 +3,7 @@
 #include "../shapes/shape.h"
 #include "light.h"
 
-#define FRAME_DELAY 15000
+#define FRAME_DELAY 1500
 #define PERSPECTIVE_DISTORTION 60
 #define PERSPECTIVE_FACTOR 5.0f
 

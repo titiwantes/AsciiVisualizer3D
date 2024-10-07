@@ -12,7 +12,7 @@ int main()
 {
     Screen screen = {150, 80, 0, ' ', NULL, NULL};
     Light light = {100.0, 10.0, -100.0, 0.5, -0.5, -10.0, 1.0};
-    Shape cube = createCube(50);
+    Shape cube = createCube(50, 30);
     Shape torus = createTorus(1.1f, 0.5f, 100, 100);
     int screenSize = screen.width * screen.height;
 
