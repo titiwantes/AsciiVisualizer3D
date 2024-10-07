@@ -9,7 +9,7 @@ Shape createCube(int length)
 {
     Shape cube;
     int facePoints = 6 * length * length - 12 * length + 8;
-    cube.size = length;
+    cube.size = facePoints;
     cube.points = (Point3D *)malloc(facePoints * sizeof(Point3D));
     if (!cube.points)
     {
@@ -37,67 +37,4 @@ Shape createCube(int length)
     cube.C = 0;
     cube.distanceFromCam = 500;
     return cube;
-}
-
-void renderCube(Screen *screen, Shape *shape)
-{
-    float shapeSizeFactor;
-    int x, y, index;
-
-    int facePoints = 6 * shape->size * shape->size - 12 * shape->size + 8;
-
-    int c_size = sqrt(shape->size / 6);
-
-    for (int i = 0; i < facePoints; i++)
-    {
-        Point3D a = shape->points[i];
-
-        float center = shape->size / 2.0;
-
-        Point3D p = rotate(shape, (Point3D){a.x - center, a.y - center, a.z - center});
-
-        shapeSizeFactor = PERSPECTIVE_FACTOR / ((p.z + center) + shape->distanceFromCam + 5);
-
-        x = (int)(screen->width / 2 + PERSPECTIVE_DISTORTION * shapeSizeFactor * (p.x + center));
-        y = (int)(screen->height / 2 + PERSPECTIVE_DISTORTION * shapeSizeFactor * (p.y + center));
-
-        index = x + y * screen->width;
-
-        if (x >= 0 && x < screen->width && y >= 0 && y < screen->height)
-        {
-            if (shapeSizeFactor > screen->depthBuffer[index])
-            {
-                screen->depthBuffer[index] = shapeSizeFactor;
-                char c;
-                if (a.x == 0)
-                {
-                    c = '.';
-                }
-                if (a.x == c_size - 1)
-                {
-                    c = '#';
-                }
-                if (a.y == 0)
-                {
-                    c = '-';
-                }
-                if (a.y == c_size - 1)
-                {
-                    c = 'O';
-                }
-                if (a.z == 0)
-                {
-                    c = '|';
-                }
-                if (a.z == c_size - 1)
-                {
-                    c = 'X';
-                }
-                screen->buffer[index] = c;
-            }
-        }
-    }
-    shape->A += 0.01;
-    shape->B += 0.1;
-    shape->C += 0.005;
 }
