@@ -51,12 +51,15 @@ void renderCube(Screen *screen, Shape *shape)
     for (int i = 0; i < facePoints; i++)
     {
         Point3D a = shape->points[i];
-        Point3D p = rotate(shape, i);
 
-        shapeSizeFactor = PERSPECTIVE_FACTOR / (p.z + shape->distanceFromCam + 5);
+        float center = shape->size / 2.0;
 
-        x = (int)(screen->width / 2 + PERSPECTIVE_DISTORTION * shapeSizeFactor * p.x);
-        y = (int)(screen->height / 2 + PERSPECTIVE_DISTORTION * shapeSizeFactor * p.y);
+        Point3D p = rotate(shape, (Point3D){a.x - center, a.y - center, a.z - center});
+
+        shapeSizeFactor = PERSPECTIVE_FACTOR / ((p.z + center) + shape->distanceFromCam + 5);
+
+        x = (int)(screen->width / 2 + PERSPECTIVE_DISTORTION * shapeSizeFactor * (p.x + center));
+        y = (int)(screen->height / 2 + PERSPECTIVE_DISTORTION * shapeSizeFactor * (p.y + center));
 
         index = x + y * screen->width;
 

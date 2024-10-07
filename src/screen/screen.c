@@ -7,15 +7,20 @@
 
 void renderScreen(Screen *screen)
 {
-    printf("\x1b[?25l");
-    printf("\x1b[H");
+
+    char output[9 + screen->height * (screen->width + 5) + 6];
+    char *ptr = output;
+
+    ptr += sprintf(ptr, "\x1b[?25l\x1b[H");
 
     for (int i = 0; i < screen->height; i++)
     {
-        printf("%.*s\x1b[0m\n", screen->width, screen->buffer + i * screen->width);
+        ptr += sprintf(ptr, "%.*s\x1b[0m\n", screen->width, screen->buffer + i * screen->width);
     }
 
-    printf("\x1b[?25h");
+    sprintf(ptr, "\x1b[?25h");
+
+    printf("%s", output);
 }
 
 void renderShape(Screen *screen, Shape *shape)
@@ -25,7 +30,7 @@ void renderShape(Screen *screen, Shape *shape)
 
     for (int i = 0; i < shape->size; i++)
     {
-        Point3D p = rotate(shape, i);
+        Point3D p = rotate(shape, shape->points[i]);
         shapeSizeFactor = PERSPECTIVE_FACTOR / (p.z + shape->distanceFromCam + 5);
 
         x = (int)(screen->width / 2 + PERSPECTIVE_DISTORTION * shapeSizeFactor * p.x);
@@ -38,13 +43,13 @@ void renderShape(Screen *screen, Shape *shape)
             if (shapeSizeFactor > screen->depthBuffer[index])
             {
                 screen->depthBuffer[index] = shapeSizeFactor;
-                screen->buffer[index] = '.';
+                screen->buffer[index] = '#';
             }
         }
     }
-    shape->A += 0.01;
-    shape->B += 0.1;
-    // shape->C += 0.005;
+    shape->A += 0.05;
+    shape->B += 0.03;
+    shape->C += 0.02;
 }
 
 void cleanup(Screen *screen, Shape *shape)
